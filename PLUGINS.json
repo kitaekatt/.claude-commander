@@ -1,0 +1,70 @@
+{
+  "_comment": "This is the aggregated PLUGINS.json format. See PLUGIN-FORMAT.md for complete format specification. Individual plugin PLUGIN.json files follow the same structure.",
+  "commands": [
+    {
+      "hello": "greeting-action"
+    },
+    {
+      "git status": "git-status-action"
+    },
+    {
+      "create command": "create-command-action"
+    },
+    {
+      "count": "count-increment-action"
+    },
+    {
+      "count reset": "count-reset-action"
+    },
+    {
+      "show next steps": "suggest-steps-action"
+    },
+    {
+      "unload plugins": "unload-plugins-action"
+    }
+  ],
+  "processes": [
+    {
+      "greeting-action": {
+        "action": "Respond with '🌟 Hello! I'm excited to help you build something amazing today! What are you working on?'",
+        "description": "Greet the user with enthusiasm"
+      }
+    },
+    {
+      "git-status-action": {
+        "execute-bash-command": "git status",
+        "description": "Check git repository status and report back to user"
+      }
+    },
+    {
+      "create-command-action": {
+        "action": "Prompt for command details, generate JSON definition, and save to commands.json",
+        "description": "Create a new command dynamically"
+      }
+    },
+    {
+      "count-increment-action": {
+        "action": "Maintain a persistent counter in memory. Increment by 1 or by the specified amount if provided. Display the new counter value. Counter starts at 0 if not initialized.",
+        "description": "Increment counter and display current value"
+      }
+    },
+    {
+      "count-reset-action": {
+        "action": "Reset the persistent counter to 0. Display confirmation message: 'Counter reset to 0'",
+        "description": "Reset counter to 0"
+      }
+    },
+    {
+      "suggest-steps-action": {
+        "action": "Analyze the current context and suggest 3-5 actionable next steps",
+        "description": "Provide actionable next step suggestions"
+      }
+    },
+    {
+      "unload-plugins-action": {
+        "action": "Deactivate plugin mode and acknowledge with '✅ Plugins unloaded. Standard response mode.' Return to normal Claude Code operation without evaluating messages against plugin patterns.",
+        "description": "Deactivate plugin mode and return to standard operation"
+      }
+    }
+  ]
+}

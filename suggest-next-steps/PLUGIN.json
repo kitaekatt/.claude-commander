@@ -1,0 +1,11 @@
+{
+  "commands": [
+    {"show next steps": "suggest-steps-action"}
+  ],
+  "processes": [
+    {"suggest-steps-action": {
+      "action": "Analyze the current context and suggest 3-5 actionable next steps",
+      "description": "Provide actionable next step suggestions"
+    }}
+  ]
+}

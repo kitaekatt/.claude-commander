@@ -1,0 +1,39 @@
+{
+  "hello": {
+    "description": "Greet the user with enthusiasm and positivity",
+    "usage": [
+      "/hello - General enthusiastic greeting",
+      "/hello [name] - Personalized greeting with name"
+    ],
+    "parameters": {
+      "name": {
+        "type": "string",
+        "required": false,
+        "description": "Optional name for personalized greeting"
+      }
+    },
+    "process": {
+      "type": "structured",
+      "steps": [
+        {
+          "action": "respond",
+          "template": "🌟 Hello{{#if name}} {{name}}{{/if}}! {{#if name}}It's wonderful to be working with you today!{{else}}I'm excited to help you build something amazing today!{{/if}} What {{#if name}}exciting project shall we tackle{{else}}are you working on{{/if}}?"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "input": "/hello",
+        "output": "🌟 Hello! I'm excited to help you build something amazing today! What are you working on?"
+      },
+      {
+        "input": "/hello Alice", 
+        "output": "🌟 Hello Alice! It's wonderful to be working with you today! What exciting project shall we tackle?"
+      }
+    ],
+    "metadata": {
+      "tone": ["enthusiastic", "professional", "encouraging", "supportive"],
+      "category": "greeting"
+    }
+  }
+}

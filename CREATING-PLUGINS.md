@@ -6,12 +6,17 @@ Build your own plugin in under 5 minutes!
 
 ```
 my-plugin/
-├── Plugin.md           # Instructions for Claude (required)
-├── commands/           # Slash command definitions (optional)
-│   └── mycommand.md   
+├── PLUGIN.json        # Plugin definition (required)
 └── scripts/           # Helper scripts (optional)
     └── helper.sh      
 ```
+
+## Plugin Format
+
+Plugins use a simple JSON format with two main components:
+
+1. **Commands**: Trigger strings that activate processes
+2. **Processes**: Actions to perform when triggered
 
 ## Step 1: Create Plugin Directory
 
@@ -19,98 +24,115 @@ my-plugin/
 mkdir .claude-plugins/my-plugin
 ```
 
-## Step 2: Write Plugin.md
+## Step 2: Create PLUGIN.json
 
-Create `my-plugin/Plugin.md` with instructions for Claude:
+Create `my-plugin/PLUGIN.json`:
 
-```markdown
-# My Plugin
-
-This plugin adds [describe functionality].
-
-## Instructions
-
-When the user:
-- Says "X" - Do Y
-- Uses /mycommand - Do Z
-
-## Behavior Patterns
-
-[Describe any patterns Claude should follow]
+```json
+{
+  "commands": [
+    {"trigger phrase": "process-name"}
+  ],
+  "processes": [
+    {"process-name": {
+      "action": "Natural language description of what to do",
+      "description": "Brief description for documentation"
+    }}
+  ]
+}
 ```
 
-## Step 3: Add Commands (Optional)
+## Step 3: Define Process Types
 
-Create `commands/mycommand.md`:
+Processes can use specific fields for clarity:
 
-```markdown
-# /mycommand
+- `action`: Natural language instructions
+- `execute-bash-command`: Shell command to run
+- `read-file`: File to read
+- `search-pattern`: Pattern to search for
+- `description`: What this process does
 
-[Description of what the command does]
-
-## Usage
-/mycommand [arguments]
-
-## Behavior
-[What Claude should do when this command is used]
-```
-
-## Step 4: Load Your Plugin
+## Step 4: Aggregate Plugins
 
 ```bash
 cd .claude-plugins
-./load-plugins.sh
+./aggregate-plugins.sh
 ```
 
 ## Example: Timer Plugin
 
+**PLUGIN.json:**
+```json
+{
+  "commands": [
+    {"start timer": "start-timer-action"},
+    {"stop timer": "stop-timer-action"},
+    {"show timers": "show-timers-action"}
+  ],
+  "processes": [
+    {"start-timer-action": {
+      "action": "Note the current time and ask what task is being timed",
+      "description": "Start tracking time for a task"
+    }},
+    {"stop-timer-action": {
+      "action": "Calculate elapsed time since timer started and report it",
+      "description": "Stop timer and show duration"
+    }},
+    {"show-timers-action": {
+      "action": "Display all active timers with their start times",
+      "description": "List all running timers"
+    }}
+  ]
+}
 ```
-timer/
-├── Plugin.md
-└── commands/
-    └── timer.md
+
+## Example: Git Helper Plugin
+
+**PLUGIN.json:**
+```json
+{
+  "commands": [
+    {"git status": "git-status-action"},
+    {"show changes": "git-diff-action"},
+    {"list branches": "git-branches-action"}
+  ],
+  "processes": [
+    {"git-status-action": {
+      "execute-bash-command": "git status",
+      "description": "Show git repository status"
+    }},
+    {"git-diff-action": {
+      "execute-bash-command": "git diff",
+      "description": "Show uncommitted changes"
+    }},
+    {"git-branches-action": {
+      "execute-bash-command": "git branch -a",
+      "description": "List all git branches"
+    }}
+  ]
+}
 ```
 
-**Plugin.md:**
-```markdown
-# Timer Plugin
+## Current Limitations
 
-Helps track time spent on tasks.
-
-## Instructions
-
-When the user:
-- Says "start timer" - Note the current time and task
-- Says "stop timer" - Calculate and report elapsed time
-- Uses /timer - Show all active timers
-```
-
-## Plugin Types
-
-### 1. Command Plugins
-Add new slash commands for specific actions.
-
-### 2. Behavior Plugins  
-Modify how Claude responds (like suggest-next-steps).
-
-### 3. Workflow Plugins
-Enhance development workflows with patterns.
-
-### 4. Integration Plugins
-Connect Claude with external tools via scripts.
+- One command per process (no multiple triggers yet)
+- No slash commands (use natural language triggers)
+- Commands and processes are defined separately
+- Plugins are loaded globally when activated
 
 ## Best Practices
 
-1. **Keep it simple** - One clear purpose per plugin
-2. **Clear instructions** - Be specific about triggers and responses
-3. **Test thoroughly** - Verify with "load plugins" 
-4. **Document usage** - Include examples in Plugin.md
+1. **Keep triggers simple** - Use natural phrases users would type
+2. **Clear process names** - Use descriptive action names
+3. **Specific field types** - Use `execute-bash-command` for shell commands
+4. **Test your JSON** - Ensure valid JSON syntax
+5. **One purpose per plugin** - Keep plugins focused
 
 ## Tips
 
-- Start with a simple command plugin
-- Test each component before adding complexity
+- Start with a single command/process pair
+- Test with `aggregate-plugins.sh` after each change
 - Use existing plugins as templates
-- Keep instructions concise and clear
+- Keep the JSON structure flat and simple
 
 Happy plugin building!

@@ -26,13 +26,12 @@ hello-world/
 1. The `Plugin.md` file contains instructions that tell Claude how to respond to greetings
 2. The `commands/hello.md` file defines the `/hello` slash command
 3. The `scripts/greet.sh` helper script can be executed to get time-aware greetings
-4. When loaded via `load-plugins.sh`, these instructions are combined into PLUGINS.md
+4. When aggregated via `aggregate-plugins.sh`, these definitions are combined into PLUGINS.json
 
 ## Testing the Plugin
 
-1. Run the load script: `cd .claude-plugins && ./load-plugins.sh`
-2. Add to your CLAUDE.md: `See .claude-plugins/PLUGINS.md for additional instructions.`
-2. Add to your CLAUDE.md: `CRICICAL: Evaluate all user messages according to rules in .claude-plugins/PLUGINS.md` 
+1. Run the aggregation script: `cd .claude-plugins && ./aggregate-plugins.sh`
+2. Add to your CLAUDE.md: `See .claude-plugins/PLUGINS.json for plugin definitions.` 
 3. Test the commands:
    - Say "hello" to get a warm greeting
    - Use `/hello` for an enthusiastic response
@@ -48,6 +47,6 @@ Use this as a template:
 3. Update Plugin.md with your instructions
 4. Add any commands in the commands/ directory
 5. Add any helper scripts in the scripts/ directory
-6. Run load-plugins.sh to activate
+6. Run aggregate-plugins.sh to activate
 
 Remember: Keep it simple! Plugins should do one thing well.

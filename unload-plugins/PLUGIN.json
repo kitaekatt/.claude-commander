@@ -1,0 +1,11 @@
+{
+  "commands": [
+    {"unload plugins": "unload-plugins-action"}
+  ],
+  "processes": [
+    {"unload-plugins-action": {
+      "action": "Deactivate plugin mode and acknowledge with '✅ Plugins unloaded. Standard response mode.' Return to normal Claude Code operation without evaluating messages against plugin patterns.",
+      "description": "Deactivate plugin mode and return to standard operation"
+    }}
+  ]
+}

@@ -1,14 +1,14 @@
 # MVP Verification Checklist
 
 ## Core Components ✅
-- [x] Plugin loading script (load-plugins.sh)
-- [x] Two example plugins (hello-world, suggest-next-steps)
-- [x] Generated PLUGINS.md file
+- [x] Plugin aggregation script (aggregate-plugins.sh)
+- [x] Three example plugins (hello-world, suggest-next-steps, local-commands)
+- [x] Generated PLUGINS.json file
 - [x] Main documentation (README.md)
 - [x] Plugin creation guide (CREATING-PLUGINS.md)
 
 ## Functionality ✅
-- [x] Plugins load correctly with ./load-plugins.sh
+- [x] Plugins aggregate correctly with ./aggregate-plugins.sh
 - [x] Multiple plugins work simultaneously
 - [x] "load plugins" activation works
 - [x] "unload plugins" deactivation works
@@ -23,15 +23,22 @@
 - [x] Works with existing CLAUDE.md system
 
 ## Example Plugins ✅
-- [x] hello-world: Demonstrates commands and basic responses
-- [x] suggest-next-steps: Shows behavior modification patterns
+- [x] hello-world: Demonstrates simple trigger/process pattern
+- [x] suggest-next-steps: Shows workflow enhancement
+- [x] local-commands: Dynamic command creation and management
 
 ## Documentation ✅
-- [x] Main README with philosophy and overview
-- [x] Quick start guide in .claude-plugins/README.md
-- [x] Plugin creation tutorial
-- [x] Clear examples
+- [x] Main README with JSON-based plugin system
+- [x] Quick start guide with trigger/process model
+- [x] Plugin creation tutorial with JSON format
+- [x] Clear examples of both action and execute-bash-command processes
+
+## Plugin System Limitations (Current)
+- [x] One command per process (no multiple triggers)
+- [x] No slash commands (natural language triggers only)
+- [x] Flat JSON structure for simplicity
+- [x] Global plugin activation
 
 ## Ready for Release ✅
 
-The Claude Code Plugin System MVP is complete and ready for use!
+The Claude Code Plugin System MVP with JSON-based triggers and processes is complete!

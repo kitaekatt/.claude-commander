@@ -1,0 +1,11 @@
+{
+  "commands": [
+    {"create command": "create-command-action"}
+  ],
+  "processes": [
+    {"create-command-action": {
+      "action": "Prompt for command details, generate JSON definition, and save to Local-Commands.json",
+      "description": "Create a new command dynamically"
+    }}
+  ]
+}
