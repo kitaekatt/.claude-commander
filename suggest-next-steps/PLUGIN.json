@@ -1,11 +1,11 @@
 {
   "commands": [
-    {"show next steps": "suggest-steps-action"}
+    {"suggest next steps": "suggest-next-steps"}
   ],
   "processes": [
-    {"suggest-steps-action": {
-      "action": "Analyze the current context and suggest 3-5 actionable next steps",
-      "description": "Provide actionable next step suggestions"
+    {"suggest-next-steps": {
+      "action": "Analyze the current context and determine six poential next steps, present the three most likely to be selected by the user",
+      "description": "reduces user friction in determining next action for AI to take"
     }}
   ]
 }
