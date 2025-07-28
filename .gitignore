@@ -1,0 +1,12 @@
+# Ignore all directories by default
+/*/
+
+# But track specific directories we want
+!/.claude-plugins/
+
+# Track all files in root directory (they're included by default)
+# No need to explicitly include them
+
+# Optional: Add any specific files to ignore in root
+# *.log
+# .DS_Store
