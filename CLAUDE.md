@@ -71,7 +71,8 @@ hello-world/
 ### Local Commands Plugin
 ```
 local-commands/
-├── PLUGIN.json         # Defines "git status" and "create command" triggers
+├── PLUGIN.json         # Defines "create command" trigger
+├── PLUGIN-local.json   # User-created commands (git-ignored)
 └── manage-commands.sh  # Helper script for command management
 ```
 
@@ -79,6 +80,12 @@ local-commands/
 ```
 suggest-next-steps/
 └── PLUGIN.json         # Workflow enhancement suggestions
+```
+
+### Git Checkin Workflow Plugin
+```
+git-checkin-workflow/
+└── PLUGIN.json         # Git commit workflows with smart suggestions
 ```
 
 ### Unload Plugins
@@ -106,8 +113,7 @@ Create `my-plugin/PLUGIN.json`:
   ],
   "processes": [
     {"process-name": {
-      "action": "Natural language description of what to do",
-      "description": "Brief description for documentation"
+      "instructions": "Natural language description of what to do"
     }}
   ]
 }
@@ -115,13 +121,11 @@ Create `my-plugin/PLUGIN.json`:
 
 ### Step 3: Define Process Types
 
-Processes can use specific fields for clarity:
+Processes use the following fields:
 
-- `action`: Natural language instructions
-- `execute-bash-command`: Shell command to run
-- `read-file`: File to read
-- `search-pattern`: Pattern to search for
-- `description`: What this process does
+- `instructions`: Natural language instructions for Claude to follow
+- `execute-bash-command`: Specific shell command to run (optional)
+- `sequence`: Array of steps for multi-step workflows (optional)
 
 ### Step 4: Aggregate Plugins
 
@@ -142,16 +146,13 @@ cd .claude-plugins
   ],
   "processes": [
     {"start-timer-action": {
-      "action": "Note the current time and ask what task is being timed",
-      "description": "Start tracking time for a task"
+      "instructions": "Note the current time and ask what task is being timed"
     }},
     {"stop-timer-action": {
-      "action": "Calculate elapsed time since timer started and report it",
-      "description": "Stop timer and show duration"
+      "instructions": "Calculate elapsed time since timer started and report it"
     }},
     {"show-timers-action": {
-      "action": "Display all active timers with their start times",
-      "description": "List all running timers"
+      "instructions": "Display all active timers with their start times"
     }}
   ]
 }
@@ -170,15 +171,15 @@ cd .claude-plugins
   "processes": [
     {"git-status-action": {
       "execute-bash-command": "git status",
-      "description": "Show git repository status"
+      "instructions": "Show git repository status"
     }},
     {"git-diff-action": {
       "execute-bash-command": "git diff",
-      "description": "Show uncommitted changes"
+      "instructions": "Show uncommitted changes"
     }},
     {"git-branches-action": {
       "execute-bash-command": "git branch -a",
-      "description": "List all git branches"
+      "instructions": "List all git branches"
     }}
   ]
 }
@@ -258,14 +259,56 @@ Submit your plugins as PRs to the main project.
 ## 📋 Example Usage
 
 ```
-You: hello
-Claude: Hello! It's great to see you. How can I assist you with your code today?
-
-You: git status
-Claude: [executes git status command and shows output]
-
 You: load plugins
 Claude: ✅ Plugins loaded. Checking PLUGINS.json before all responses.
+
+You: hello
+Claude: 🌟 Hello! I'm excited to help you build something amazing today! What are you working on?
+
+You: git checkin
+Claude: [executes git status, adds files, shows diff, suggests commit message]
+Claude: Based on the changes, I suggest this commit message:
+"Update plugin system documentation and add git workflow"
+
+Would you like to use this message or provide your own?
+
+You: git checkin fast
+Claude: [executes full git checkin workflow with auto-generated message]
 ```
+
+## 🎉 New Features
+
+### Git Checkin Workflows
+
+The git checkin plugin now offers two modes:
+
+1. **"git checkin"** - Interactive mode that:
+   - Shows repository status
+   - Stages all changes
+   - Reviews the diff
+   - Suggests a commit message based on changes
+   - Asks for confirmation or alternative message
+
+2. **"git checkin fast"** - Quick mode that:
+   - Performs all the same steps
+   - Auto-generates commit message
+   - Commits immediately without confirmation
+
+### Sequential Workflows
+
+Plugins can now define multi-step workflows using the `sequence` field:
+
+```json
+{"my-workflow": {
+  "instructions": "Execute the following sequence",
+  "sequence": [
+    "Step 1 description",
+    "Step 2 description",
+    "Step 3 description"
+  ]
+}}
+```
+
+Claude will create a todo list and execute each step in order.
 
 Happy plugin building!
