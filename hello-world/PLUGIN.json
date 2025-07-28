@@ -4,8 +4,7 @@
   ],
   "processes": [
     {"greeting-action": {
-      "action": "Respond with '🌟 Hello! I'm excited to help you build something amazing today! What are you working on?'",
-      "description": "Greet the user with enthusiasm"
+      "instructions": "Respond with '🌟 Hello! I'm excited to help you build something amazing today! What are you working on?'"
     }}
   ]
 }

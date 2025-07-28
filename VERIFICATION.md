@@ -4,7 +4,7 @@
 - [x] Plugin aggregation script (aggregate-plugins.sh)
 - [x] Three example plugins (hello-world, suggest-next-steps, local-commands)
 - [x] Generated PLUGINS.json file
-- [x] Main documentation (README.md)
+- [x] Main documentation (CLAUDE.md)
 - [x] Plugin creation guide (CREATING-PLUGINS.md)
 
 ## Functionality ✅

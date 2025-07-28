@@ -4,8 +4,7 @@
   ],
   "processes": [
     {"suggest-next-steps": {
-      "action": "Analyze the current context and determine six poential next steps, present the three most likely to be selected by the user",
-      "description": "reduces user friction in determining next action for AI to take"
+      "instructions": "Analyze the current context and determine six potential next steps, present the three most likely to be selected by the user"
     }}
   ]
 }

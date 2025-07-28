@@ -6,6 +6,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGINS_DIR="$SCRIPT_DIR"
 OUTPUT_FILE="$PLUGINS_DIR/PLUGINS.json"
 
+# Critical instructions for PLUGINS.json interpretation
+CRITICAL_INSTRUCTIONS="While strict plugin mode is active do not refresh or reload this file. Only treat triggers within this file as commands."
+
 # Initialize temporary arrays for commands and processes
 commands_file="$PLUGINS_DIR/.commands.tmp"
 processes_file="$PLUGINS_DIR/.processes.tmp"
@@ -52,7 +55,8 @@ done
 # Combine commands and processes into final structure
 echo "Creating final PLUGINS.json..."
 jq -n --slurpfile commands "$commands_file" --slurpfile processes "$processes_file" \
-    '{commands: $commands[0], processes: $processes[0]}' > "$OUTPUT_FILE"
+    --arg critical_instructions "$CRITICAL_INSTRUCTIONS" \
+    '{"critical-instructions": $critical_instructions, commands: $commands[0], processes: $processes[0]}' > "$OUTPUT_FILE"
 
 # Clean up temporary files
 rm -f "$commands_file" "$processes_file" "$commands_file.tmp" "$processes_file.tmp"
