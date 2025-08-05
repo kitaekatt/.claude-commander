@@ -2,7 +2,7 @@
 /*/
 
 # But track specific directories we want
-!/.claude-plugins/
+!/.claude-commands/
 
 # Track all files in root directory (they're included by default)
 # No need to explicitly include them

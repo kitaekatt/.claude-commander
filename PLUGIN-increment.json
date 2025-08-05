@@ -1,0 +1,11 @@
+{
+  "command-trigger": "increment",
+  "description": "Increment a counter value stored in ./tmp/counter.txt",
+  "command-actions": [
+    "Check if ./tmp/counter.txt exists using the Read tool",
+    "If file doesn't exist, set counter value to 1",
+    "If file exists, read the current number from the file and add 1 to it", 
+    "Write the new counter value to ./tmp/counter.txt using the Write tool",
+    "Display message: 'The counter is at {counter_value}'"
+  ]
+}

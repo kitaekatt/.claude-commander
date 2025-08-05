@@ -2,206 +2,230 @@
 
 ## Overview
 
-PLUGIN.json defines a Claude Code plugin's commands and processes. The format enables natural language command triggers that map to specific actions Claude should take.
+PLUGIN.json defines a Claude Code plugin's command-actions. **Plugins are actions triggered by slash commands** - when you type `/hello` or `/git fast`, Claude Code loads the corresponding plugin and executes the defined actions.
 
-## Structure
+The plugin directory name becomes the command name exactly (e.g., `hello/` becomes `/hello`), and the PLUGIN.json file defines what actions Claude should take when that command is invoked.
+
+## Two Plugin Formats
+
+### Format 1: Simple Single-Step Plugins
+
+For plugins that perform a single action with no parameters.
+
+**Command**: `/hello` (from `hello/` directory)  
+**Purpose**: Greet the user with an encouraging message
 
 ```json
 {
-  "plugin-commands": [
-    {"<trigger>": "<plugin-processs-name>"}
-  ],
-  "plugin-processes": [
-    {"<plugin-processs-name>": {
-      "<action-type>": "<action-value>",
-      "instructions": "<process-instructions>"
-    }}
+  "instructions": "Respond with '🌟 Hello! I'm excited to help you build something amazing today! What are you working on?'"
+}
+```
+
+### Format 2: Parameter-Based Multi-Step Plugins  
+
+For plugins that support parameters and/or multiple steps.
+
+**Command**: `/git` (from `git/` directory)  
+**Purpose**: Git operations with multiple subcommands  
+**Usage**: `/git` (show help), `/git status`, `/git commit`, `/git commit-fast`
+
+```json
+{
+  "instructions": "Identify the sequence to follow based on command parameters and execute the sequence of instructions in order. If you encounter errors, present them to the user.",
+  "sequences": [
+    {"default": "Show available git subcommands and their descriptions: 'status' (check repository state), 'commit' (interactive commit workflow), 'commit-fast' (auto-commit workflow)"},
+    {"status": "Run 'git status' to check repository state and report current status"},
+    {"commit": [
+      "Run 'git status' to check repository state",
+      "Run 'git add .' to stage all changes", 
+      "Run 'git diff --staged' to review staged changes",
+      "Ask user to confirm the suggested message or provide an alternative",
+      "Run 'git commit -m \"<message>\"' with the confirmed message"
+    ]},
+    {"commit-fast": [
+      "Run 'git status' to check repository state",
+      "Run 'git add .' to stage all changes", 
+      "Run 'git diff --staged' to review staged changes",
+      "Run 'git commit -m \"<message>\"' immediately with auto-generated message"
+    ]}
   ]
 }
 ```
 
-## Fields
+## Field Definitions
 
-### plugin-commands (required)
-An array of command trigger mappings. Each entry is an object with a single key-value pair:
-- **Key**: The exact phrase that triggers this command (case-sensitive)
-- **Value**: The name of the plugin-process to execute
+### instructions (required)
+- **Format 1**: Natural language instruction describing the single action to perform
+- **Format 2**: Standard guidance for Claude on how to interpret and execute sequences (typically the same across all plugins)
 
-Example:
-```json
-"plugin-commands": [
-  {"hello": "greeting-action"},
-  {"git status": "git-status-action"}
-]
-```
+### sequences (optional, only for Format 2)
+An array of parameter-to-sequence mappings. Each entry is an object with a single key (the parameter name) containing an array of step-by-step instructions.
 
-### plugin-processes (required)
-An array of plugin-process definitions. Each entry is an object with a single key (the plugin-process name) containing the plugin-process configuration:
+- **"default"** (required if sequences present): Array of steps to execute when no parameters are provided
+- **"parameter-name"** (optional): Array of steps to execute when that parameter is provided
 
-#### Process Configuration
-- **instructions** (required): Natural language instructions for Claude to follow. When referencing a sequence, use phrases like "Execute the sequence" or "Execute the following steps"
-- **execute-bash-command** (optional): A specific bash command to execute directly
-- **sequence** (optional): An array of step-by-step instructions to execute as a todo list
+**Important**: If `sequences` is present, it must include a "default" sequence to handle the no-parameter case.
 
-## Action Types
+## Complete Examples
 
-### 1. Natural Language Instructions
-Use the `instructions` field for actions Claude should perform:
+### Example 1: Hello World Plugin
 
-```json
-{"greeting-action": {
-  "instructions": "Respond with '🌟 Hello! I'm excited to help you build something amazing today!'"
-}}
-```
-
-### 2. Bash Command Execution
-Use the `execute-bash-command` field for specific plugin-commands:
-
-```json
-{"git-status-action": {
-  "execute-bash-command": "git status",
-  "instructions": "Check git repository status and report back to user"
-}}
-```
-
-## Complete Example
+**Command**: `/hello` (from `hello/` directory)  
+**Purpose**: Greet the user with an encouraging message  
+**Usage**: `/hello`
 
 ```json
 {
-  "plugin-commands": [
-    {"hello": "greeting-action"},
-    {"git status": "git-status-action"},
-    {"create command": "create-command-action"}
-  ],
-  "processes": [
-    {"greeting-action": {
-      "instructions": "Respond with '🌟 Hello! I'm excited to help you build something amazing today!'"
-    }},
-    {"git-status-action": {
-      "execute-bash-command": "git status",
-      "instructions": "Check git repository status and report back to user"
-    }},
-    {"create-command-action": {
-      "instructions": "Prompt for command details, generate JSON definition, and save to local-commands.json"
-    }}
+  "instructions": "Respond with '🌟 Hello! I'm excited to help you build something amazing today! What are you working on?'"
+}
+```
+
+### Example 2: Git Workflow Plugin
+
+**Command**: `/git` (from `git/` directory)  
+**Purpose**: Git operations with multiple subcommands  
+**Usage**: `/git` (show help), `/git status` (check status), `/git commit` (interactive), `/git commit-fast` (auto-commit)
+
+```json
+{
+  "instructions": "Identify the sequence to follow based on command parameters and execute the sequence of instructions in order. If you encounter errors, present them to the user.",
+  "sequences": [
+    {"default": "Show available git subcommands and their descriptions: 'status' (check repository state), 'commit' (interactive commit workflow), 'commit-fast' (auto-commit workflow)"},
+    {"status": "Run 'git status' to check repository state and report current status"},
+    {"commit": [
+      "Run 'git status' to check repository state",
+      "Run 'git add .' to stage all changes", 
+      "Run 'git diff --staged' to review staged changes",
+      "Analyze the changes and suggest a commit message based on the diff",
+      "Ask user to confirm the suggested message or provide an alternative",
+      "Run 'git commit -m \"<message>\"' with the confirmed message"
+    ]},
+    {"commit-fast": [
+      "Run 'git status' to check repository state",
+      "Run 'git add .' to stage all changes", 
+      "Run 'git diff --staged' to review staged changes",
+      "Analyze the changes and generate a commit message based on the diff",
+      "Run 'git commit -m \"<message>\"' immediately with the generated message"
+    ]}
   ]
 }
 ```
 
-## Sequential Workflow Processes
+### Example 3: Suggest Next Steps Plugin
 
-Plugins can define complex workflows using an optional `sequence` array. When present, the `instructions` field should indicate that the sequence should be executed.
-
-### Example: Git Checkin Workflow
+**Command**: `/suggest` (from `suggest/` directory)  
+**Purpose**: Analyze context and suggest likely next actions  
+**Usage**: `/suggest`
 
 ```json
 {
-  "plugin-commands": [
-    {"git checkin": "git-checkin-workflow"}
-  ],
-  "plugin-processes": [
-    {"git-checkin-workflow": {
-      "instructions": "Execute the git checkin sequence: status check, staging, review, and commit",
-      "sequence": [
-        "Run 'git status' to check repository state",
-        "Run 'git add .' to stage all changes", 
-        "Run 'git diff --staged' to review staged changes",
-        "Prompt user for commit message and run 'git commit -m \"<message>\"'"
-      ]
-    }}
-  ]
+  "instructions": "Analyze the current context and determine six potential next steps, present the three most likely to be selected by the user"
 }
 ```
 
-### Sequential Process Fields
+### Example 4: Create Command Plugin
 
-- **instructions**: Describes what to do. When using sequences, include phrases like "Execute the sequence" or "Execute the following steps"
-- **sequence** (optional): Array of natural language instructions to execute as todo items in order
+**Command**: `/create` (from `create/` directory)  
+**Purpose**: Interactive command creation wizard  
+**Usage**: `/create`
 
-### How Sequential Workflows Work
-
-When Claude encounters a process with a `sequence` array:
-
-1. **Creates Todo List**: Each sequence item becomes a todo item
-2. **Sequential Execution**: Steps execute in order, marked as in_progress → completed
-3. **Error Handling**: Workflow stops if any step fails
-4. **Natural Language**: Each step uses plain English instructions
-
-### More Examples
-
-**Testing and Deployment:**
 ```json
-{"test-and-deploy": {
-  "instructions": "Execute the test, build, and deploy sequence",
-  "sequence": [
-    "Run 'npm test' to validate functionality",
-    "Run 'npm run build' for production",
-    "Run 'git add .' to stage build changes",
-    "Run 'git commit -m \"Build for deployment\"'",
-    "Run 'git push origin main'"
-  ]
-}}
+{
+  "instructions": "Prompt for command details, generate JSON definition, and save to PLUGIN-local.json"
+}
 ```
 
-**Code Quality Check:**
+## Plugin Directory to Command Mapping
+
+**Required**: Plugin directory names must exactly match the command name.
+
+- `hello/` → `/hello` command
+- `git/` → `/git` command  
+- `suggest/` → `/suggest` command
+- `create/` → `/create` command
+
+## Generated Slash Commands
+
+Each plugin becomes a slash command file containing the complete JSON structure:
+
+**Simple plugin generates:**
+```markdown
+---
+description: "hello command from hello plugin"
+argument-hint: ""
+---
+
 ```json
-{"quality-check": {
-  "instructions": "Execute the comprehensive code quality validation sequence",
-  "sequence": [
-    "Run 'npm run lint' to check code style",
-    "Run 'npm run typecheck' to validate types",
-    "Run 'npm test' to run test suite",
-    "Run 'npm audit' to check for vulnerabilities"
-  ]
-}}
+{
+  "instructions": "Respond with '🌟 Hello! I'm excited to help you build something amazing today! What are you working on?'"
+}
 ```
 
-## Best Practices
+**Parameter-based plugin generates:**
+```markdown
+---
+description: "git command from git plugin"
+argument-hint: ""
+---
 
-1. **Clear Triggers**: Use natural, memorable phrases for command triggers
-2. **Descriptive Names**: Process names should indicate their purpose (e.g., `greeting-action`, not `action1`)
-3. **Helpful Descriptions**: Write instructionss that explain what the plugin-process does for users
-4. **Action Clarity**: Make action instructions specific and unambiguous
-5. **Consistent Format**: Follow the exact structure - the aggregator expects this format
-6. **Sequential Steps**: For multi-step workflows, explicitly number the steps and describe the todo management approach
+```json
+{
+  "instructions": "Identify the sequence to follow based on command parameters and execute the sequence of instructions in order. If you encounter errors, present them to the user.",
+  "sequences": [
+    {"default": [
+      "Run 'git status' to check repository state",
+      "Run 'git add .' to stage all changes", 
+      "Run 'git diff --staged' to review staged changes",
+      "Ask user to confirm the suggested message or provide an alternative",
+      "Run 'git commit -m \"<message>\"' with the confirmed message"
+    ]},
+    {"fast": [
+      "Run 'git status' to check repository state",
+      "Run 'git add .' to stage all changes", 
+      "Run 'git diff --staged' to review staged changes",
+      "Run 'git commit -m \"<message>\"' immediately with auto-generated message"
+    ]}
+  ]
+}
+```
 
 ## Integration
 
-Individual PLUGIN.json files are aggregated into PLUGINS.json by the `aggregate-plugins.sh` script:
+Individual PLUGIN.json files are processed by the `generate-commands.sh` script to create slash commands:
 
 ```
-.claude-plugins/
-├── hello-world/
+.claude-commands/
+├── hello/
 │   └── PLUGIN.json
-├── local-commands/
+├── git/
 │   └── PLUGIN.json
-├── aggregate-plugins.sh
-└── PLUGINS.json (generated)
+├── suggest/
+│   └── PLUGIN.json
+├── create/
+│   └── PLUGIN.json
+├── generate-commands.sh
+└── .claude/commands/ (generated)
+    ├── hello.md
+    ├── git.md
+    ├── suggest.md
+    └── create.md
 ```
 
-The aggregated PLUGINS.json maintains a flat structure by merging all plugin-commands and plugin-processes:
-```json
-{
-  "plugin-commands": [
-    {"hello": "greeting-action"},
-    {"git status": "git-status-action"},
-    {"create command": "create-command-action"},
-    {"show next steps": "suggest-steps-action"}
-  ],
-  "processes": [
-    {"greeting-action": { /* plugin-process definition */ }},
-    {"git-status-action": { /* pplugin-rocess definition */ }},
-    {"create-command-action": { /* plugin-process definition */ }},
-    {"suggest-steps-action": { /* plugin-process definition */ }}
-  ]
-}
-```
-
-**Important**: The aggregation process merges all plugin-commands and plugin-processes into single flat arrays, avoiding nested plugin namespaces. This ensures efficient command lookup and processing.
-
-## Validation
+## Validation Rules
 
 - JSON must be valid (use a JSON validator)
-- Each command trigger must map to a defined process
-- Process names must be unique within the plugin
-- Either `action` or `execute-bash-command` must be specified (not both)
+- **Plugin directory name must exactly match the command name**
+- `instructions` field is always required
+- If `sequences` is present, it must include a "default" sequence
+- Parameter names must be unique within the plugin  
+- All sequence values must be arrays of strings (steps)
+- Arrays must have at least one entry
+
+## Best Practices
+
+1. **Choose the right format**: Use Format 1 for simple single actions, Format 2 for parameters or multi-step workflows
+2. **Clear parameter names**: Use descriptive parameter names like "fast", "verbose", "dry-run"
+3. **Descriptive steps**: Write clear, actionable step descriptions
+4. **Include bash commands**: Use natural language like "Run 'git status'" for shell commands
+5. **Consistent instructions**: Use the standard instructions text for Format 2 plugins
+6. **Test your JSON**: Validate JSON syntax before using
