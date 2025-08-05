@@ -35,143 +35,134 @@ A simple plugin system for Claude Code that works through slash command generati
 
 ## 📁 Plugin Structure
 
-Plugins are directories containing:
+Plugins are individual command files in the `commands/` directory:
 ```
-my-plugin/
-├── PLUGIN.json        # Plugin definition with command-triggers and command-actions
-└── helper.sh          # Helper scripts (optional)
+commands/
+├── hello.md           # Hello world command
+├── git.md             # Git workflow commands
+├── suggest.md         # Suggestion commands
+└── my-command.md      # Your custom command
 ```
 
-A generation script converts plugin definitions into Claude Code slash commands stored in `.claude/commands/`.
+The generation script copies these `.md` files directly to `.claude/commands/` where Claude Code discovers them as slash commands.
 
 ## 🎯 Available Plugins
 
-### Hello World Plugin
+### Hello World Command
 ```
-hello-world/
-└── PLUGIN.json         # Defines "/hello" command with greeting action
+commands/hello.md       # Defines "/hello" command with greeting action
 ```
 
 **Usage:** `/hello`
 
-### Git Checkin Workflow Plugin
+### Git Workflow Commands
 ```
-git-checkin-workflow/
-└── PLUGIN.json         # Git commit workflows with smart suggestions
+commands/git.md         # Git commit workflows with smart suggestions
 ```
 
-**Usage:** `/git checkin` or `/git checkin --fast`
+**Usage:** `/git commit` or `/git commit-fast`
 
-### Suggest Next Steps Plugin
+### Suggest Next Steps Command
 ```
-suggest-next-steps/
-└── PLUGIN.json         # Workflow enhancement suggestions
+commands/suggest.md     # Workflow enhancement suggestions
 ```
 
 **Usage:** `/suggest`
 
-### Local Commands Plugin
+### Plugin Management Commands
 ```
-local-commands/
-├── PLUGIN.json         # Command creation framework
-├── PLUGIN-local.json   # User-created commands (git-ignored)
-└── manage-commands.sh  # Helper script for command management
+commands/plugin.md      # Plugin system management
 ```
 
-**Usage:** `/create command`
+**Usage:** `/plugin list`, `/plugin create`, `/plugin generate`
 
 ## 🔧 Creating Your Own Plugin
 
-### Step 1: Create Plugin Directory
+### Step 1: Create Command File
+
+Create a new `.md` file in the `commands/` directory:
 
 ```bash
-mkdir .claude-commands/my-plugin
+touch .claude-commands/commands/my-command.md
 ```
 
-### Step 2: Create PLUGIN.json
+### Step 2: Define Command Structure
 
-Create `my-plugin/PLUGIN.json`:
+Edit your command file with this structure:
 
-```json
+```markdown
+---
+description: "my-command description"
+argument-hint: "optional | arguments"
+---
+
+\`\`\`json
 {
-  "commands": [
-    {"command-trigger": "command-action-name"}
-  ],
+  "instructions": "Natural language description of what to do",
   "sequences": [
-    {"command-action-name": {
-      "instructions": "Natural language description of what to do"
-    }}
+    {"default": "Default action when no arguments provided"},
+    {"action-name": "Action for specific arguments"}
   ]
 }
+\`\`\`
 ```
 
-### Step 3: Define Command-Action Types
-
-Command-actions use the following fields:
-
-- `instructions`: Natural language instructions for Claude to follow
-- `sequence`: Array of steps for multi-step workflows (optional)
-
-### Step 4: Generate Commands
+### Step 3: Generate Commands
 
 ```bash
 cd .claude-commands
 ./generate-commands.sh
 ```
 
-Your plugin is now available as slash commands!
+Your command is now available as `/my-command`!
 
-### Example: Timer Plugin
+### Example: Timer Command
 
-**PLUGIN.json:**
-```json
+**commands/timer.md:**
+```markdown
+---
+description: "Timer management commands"
+argument-hint: "start | stop | show"
+---
+
+\`\`\`json
 {
-  "commands": [
-    {"start timer": "start-timer-action"},
-    {"stop timer": "stop-timer-action"},
-    {"show timers": "show-timers-action"}
-  ],
+  "instructions": "Identify the sequence to follow based on command parameters and execute the sequence of instructions in order. If you encounter errors, present them to the user.",
   "sequences": [
-    {"start-timer-action": {
-      "instructions": "Note the current time and ask what task is being timed"
-    }},
-    {"stop-timer-action": {
-      "instructions": "Calculate elapsed time since timer started and report it"
-    }},
-    {"show-timers-action": {
-      "instructions": "Display all active timers with their start times"
-    }}
+    {"default": "Show available timer commands: start, stop, show"},
+    {"start": "Note the current time and ask what task is being timed"},
+    {"stop": "Calculate elapsed time since timer started and report it"},
+    {"show": "Display all active timers with their start times"}
   ]
 }
+\`\`\`
 ```
 
-**Generated Commands:** `/start timer`, `/stop timer`, `/show timers`
+**Generated Commands:** `/timer start`, `/timer stop`, `/timer show`
 
-### Example: Git Helper Plugin
+### Example: Git Helper Command
 
-**PLUGIN.json:**
-```json
+**commands/git-helper.md:**
+```markdown
+---
+description: "Git helper commands"
+argument-hint: "status | changes | branches"
+---
+
+\`\`\`json
 {
-  "commands": [
-    {"git status": "git-status-action"},
-    {"show changes": "git-diff-action"},
-    {"list branches": "git-branches-action"}
-  ],
+  "instructions": "Identify the sequence to follow based on command parameters and execute the sequence of instructions in order. If you encounter errors, present them to the user.",
   "sequences": [
-    {"git-status-action": {
-      "instructions": "Show git repository status"
-    }},
-    {"git-diff-action": {
-      "instructions": "Show uncommitted changes"
-    }},
-    {"git-branches-action": {
-      "instructions": "List all git branches"
-    }}
+    {"default": "Show available git helper commands: status, changes, branches"},
+    {"status": "Show git repository status"},
+    {"changes": "Show uncommitted changes"},
+    {"branches": "List all git branches"}
   ]
 }
+\`\`\`
 ```
 
-**Generated Commands:** `/git status`, `/show changes`, `/list branches`
+**Generated Commands:** `/git-helper status`, `/git-helper changes`, `/git-helper branches`
 
 ## 📤 Plugin Distribution
 
@@ -209,31 +200,33 @@ git clone <plugin-repo> .claude-commands
 
 ## ✅ Best Practices
 
-1. **Keep command-triggers simple** - Use natural phrases users would type
-2. **Clear command-action names** - Use descriptive action names
-4. **Test your JSON** - Ensure valid JSON syntax
-5. **One purpose per plugin** - Keep plugins focused
+1. **Keep command names simple** - Use natural phrases users would type
+2. **Clear sequence names** - Use descriptive action names for sequences
+3. **Test your JSON** - Ensure valid JSON syntax in the embedded code block
+4. **One purpose per command** - Keep commands focused
+5. **Use argument-hint** - Help users understand available options
 
 ## 💡 Tips
 
-- Start with a single command/sequence pair
+- Start with a single command with default sequence
 - Test with `generate-commands.sh` after each change
-- Use existing plugins as templates  
+- Use existing commands as templates  
 - Keep the JSON structure flat and simple
+- Edit `.md` files directly - what you see is what gets deployed
 
 ## 🔧 Troubleshooting
 
 ### Commands Not Available
 1. Run `./generate-commands.sh` to regenerate command definitions
 2. Check that `.claude/commands/` directory contains your command files
-3. Verify your PLUGIN.json files have valid JSON syntax
+3. Verify your `.md` files have valid JSON syntax in the code blocks
 4. Restart Claude Code if commands don't appear
 
-### Creating Plugins
-1. Always test your PLUGIN.json syntax
-2. Keep command-triggers simple and clear
-3. Write descriptive command-action definitions
-4. Test plugins after running generate-commands.sh
+### Creating Commands
+1. Always test your JSON syntax in the code block
+2. Keep command names simple and clear
+3. Write descriptive sequence definitions
+4. Test commands after running generate-commands.sh
 
 ## 🤝 Contributing
 

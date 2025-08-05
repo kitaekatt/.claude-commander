@@ -4,99 +4,45 @@
 # Script location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-PLUGINS_DIR="$PROJECT_ROOT/.claude-commands"
-COMMANDS_DIR="$PROJECT_ROOT/.claude/commands"
+COMMANDS_SOURCE_DIR="$SCRIPT_DIR/commands"
+COMMANDS_TARGET_DIR="$PROJECT_ROOT/.claude/commands"
 
 # Create commands directory if it doesn't exist
-mkdir -p "$COMMANDS_DIR"
+mkdir -p "$COMMANDS_TARGET_DIR"
 
 echo "Generating slash commands from plugins..."
-plugin_count=0
+command_count=0
 expected_commands=()
 
 # Clean up old plugin-generated commands (but keep manually created ones)
-find "$COMMANDS_DIR" -name "*.md" -exec grep -l "from.*plugin" {} \; | xargs rm -f 2>/dev/null
+find "$COMMANDS_TARGET_DIR" -name "*.md" -exec grep -l "from.*plugin" {} \; | xargs rm -f 2>/dev/null
 
-# Process each plugin directory
-for plugin_dir in "$PLUGINS_DIR"/*/; do
-    if [ -d "$plugin_dir" ] && [ -f "$plugin_dir/PLUGIN.json" ]; then
-        plugin_name=$(basename "$plugin_dir")
-        echo "  - Processing $plugin_name"
-        
-        # Command name is exactly the plugin directory name
-        command_name="$plugin_name"
-        
-        command_file="$COMMANDS_DIR/${command_name}.md"
-        command_filename="${command_name}.md"
-        expected_commands+=("$command_filename")
-        
-        echo "    - Creating command: /$command_name"
-        
-        # Get the entire plugin definition
-        plugin_content=$(jq '.' "$plugin_dir/PLUGIN.json")
-        
-        # Check if plugin has sequences and validate "default" requirement
-        has_sequences=$(jq -r '.sequences // empty' "$plugin_dir/PLUGIN.json")
-        has_default=""
-        if [ -n "$has_sequences" ] && [ "$has_sequences" != "null" ]; then
-            has_default=$(jq -r '.sequences[] | keys[] | select(. == "default")' "$plugin_dir/PLUGIN.json" | head -1)
+# Copy all .md files from commands source to target
+if [ -d "$COMMANDS_SOURCE_DIR" ]; then
+    for command_file in "$COMMANDS_SOURCE_DIR"/*.md; do
+        if [ -f "$command_file" ]; then
+            command_name=$(basename "$command_file" .md)
+            target_file="$COMMANDS_TARGET_DIR/$(basename "$command_file")"
+            
+            echo "  - Installing command: /$command_name"
+            cp "$command_file" "$target_file"
+            
+            expected_commands+=("$(basename "$command_file")")
+            ((command_count++))
         fi
-        
-        if [ "$plugin_content" != "null" ]; then
-            # Only validate "default" if sequences are present
-            if [ -n "$has_sequences" ] && [ "$has_sequences" != "null" ] && [ -z "$has_default" ]; then
-                echo "    ❌ ERROR: Plugin $plugin_name has 'sequences' but missing required 'default' sequence"
-                echo "    Skipping plugin - when using 'sequences', must include a 'default' sequence"
-                continue
-            fi
-            # Generate command content with full JSON structure
-            {
-                echo "---"
-                echo "description: \"$command_name command from $plugin_name plugin\""
-                echo "argument-hint: \"\""
-                echo "---"
-                echo ""
-                echo "\`\`\`json"
-                echo "$plugin_content" | jq '.'
-                echo "\`\`\`"
-            } > "$command_file"
-        fi
-        
-        ((plugin_count++))
-    fi
-done
-
-# Create plugin management command if it doesn't exist and no plugin/PLUGIN.json exists
-if [ ! -f "$COMMANDS_DIR/plugin.md" ] && [ ! -f "$PLUGINS_DIR/plugin/PLUGIN.json" ]; then
-    cat > "$COMMANDS_DIR/plugin.md" << 'EOF'
----
-description: "Plugin system management commands"
-argument-hint: "list | install | create"
----
-
-```json
-{
-  "instructions": "Handle plugin management based on $ARGUMENTS",
-  "actions": {
-    "list": "Show available slash commands in .claude/commands/ directory using LS tool",
-    "install": "Prompt user for plugin source (directory/repository) and help install to .claude-commands/",
-    "create": "Start interactive plugin creation wizard by prompting for command name and action details",
-    "default": "If no arguments provided, default to 'list' action"
-  }
-}
-```
-EOF
+    done
+else
+    echo "Commands source directory not found: $COMMANDS_SOURCE_DIR"
 fi
-expected_commands+=("plugin.md")
 
-echo "Generated slash commands for $plugin_count plugin(s)"
-echo "Commands available in $COMMANDS_DIR"
+echo "Generated slash commands for $command_count command(s)"
+echo "Commands available in $COMMANDS_TARGET_DIR"
 echo ""
 
 # Check for orphaned commands
-if [ -d "$COMMANDS_DIR" ]; then
+if [ -d "$COMMANDS_TARGET_DIR" ]; then
     orphaned_commands=()
-    for existing_file in "$COMMANDS_DIR"/*.md; do
+    for existing_file in "$COMMANDS_TARGET_DIR"/*.md; do
         if [ -f "$existing_file" ]; then
             filename=$(basename "$existing_file")
             if [[ ! " ${expected_commands[@]} " =~ " ${filename} " ]]; then
@@ -106,20 +52,17 @@ if [ -d "$COMMANDS_DIR" ]; then
     done
     
     if [ ${#orphaned_commands[@]} -gt 0 ]; then
-        echo "⚠️  WARNING: Found orphaned command files (not generated by any plugin):"
+        echo "⚠️  WARNING: Found orphaned command files (not from commands directory):"
         for orphan in "${orphaned_commands[@]}"; do
             echo "  - $orphan"
         done
         echo ""
-        echo "💡 Consider deleting these files:"
-        for orphan in "${orphaned_commands[@]}"; do
-            echo "  rm \"$COMMANDS_DIR/$orphan\""
-        done
+        echo "💡 These may be manually created commands or old plugin files"
         echo ""
     fi
 fi
 
 echo "Available commands:"
-if [ -d "$COMMANDS_DIR" ]; then
-    find "$COMMANDS_DIR" -name "*.md" -printf "  /%f\n" | sed 's/.md$//' | sort
+if [ -d "$COMMANDS_TARGET_DIR" ]; then
+    find "$COMMANDS_TARGET_DIR" -name "*.md" -printf "  /%f\n" | sed 's/.md$//' | sort
 fi
