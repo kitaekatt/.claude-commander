@@ -6,9 +6,15 @@ A simple plugin system for Claude Code that works through configuration augmenta
 
 ### Using Existing Plugins
 
-1. **Activate plugins** in Claude Code by saying **"load plugins"**
+**New Slash Command System (Recommended):**
+1. Use slash commands directly: `/hello`, `/git checkin`, `/suggest`
+2. No activation needed - commands work immediately
+3. Tab completion and built-in help available
+
+**Legacy Natural Language System:**
+1. Say **"load plugins"** or use `/plugin load`
 2. Claude responds: "✅ Plugins loaded. Checking PLUGINS.json before all responses."
-3. Use plugin commands like "hello" or "git status"
+3. Use natural language commands like "hello" or "git checkin"
 
 ### Installing New Plugins
 
@@ -25,19 +31,21 @@ A simple plugin system for Claude Code that works through configuration augmenta
 
 3. Activate in Claude Code by saying **"load plugins"**
 
-## 🔌 Plugin Activation
+## 🔌 Plugin System
 
-**Plugins are INACTIVE by default.** You control when plugins are active:
+**Two Ways to Use Plugins:**
 
-**To activate:** Say **"load plugins"** in your Claude Code session.
+### Slash Commands (Recommended)
+- **Direct usage:** Type `/hello`, `/git checkin`, `/suggest` etc.
+- **No activation needed:** Commands work immediately
+- **Built-in help:** Tab completion and argument hints
+- **Parameterized:** Use `/git checkin --fast` or `/plugin list`
 
-**During Active Plugin Mode:**
-1. Claude evaluates your messages against command triggers from PLUGINS.json
-2. If a message matches a trigger, Claude executes the associated process
-3. Only uses standard response if no trigger matches
-4. Plugin definitions remain in context - no need to reload
-
-**Re-initialization:** Say "load plugins" again to reinforce adherence.
+### Legacy Natural Language (Backwards Compatibility)
+- **Activation required:** Say "load plugins" or use `/plugin load`
+- **Natural triggers:** Type "hello", "git checkin", "suggest next steps"
+- **Pattern matching:** Claude evaluates messages against triggers
+- **Context maintained:** No need to reload during session
 
 ## 🛠️ What This Is
 
@@ -210,12 +218,20 @@ git clone <plugin-repo> .claude-plugins
 - **Practical**: Build plugins that solve real problems
 - **Transparent**: You can see exactly what each plugin does
 
-## 🔍 Current Limitations
+## 🔍 Current Features
 
-- One command per process (no multiple triggers yet)
-- No slash commands (use natural language triggers)
-- Commands and processes are defined separately
-- Plugins are loaded globally when activated
+### Slash Command System
+- ✅ Native Claude Code integration
+- ✅ Tab completion and help
+- ✅ Parameterized commands (`/git checkin --fast`)
+- ✅ Immediate availability (no activation needed)
+- ✅ Auto-generated from plugin definitions
+
+### Legacy Natural Language System  
+- ✅ Backwards compatibility maintained
+- ✅ Pattern matching for flexible triggers
+- ✅ Sequential workflow support
+- ⚠️ Requires activation with "load plugins"
 
 ## ✅ Best Practices
 

@@ -1,5 +1,5 @@
 {
-  "critical-instructions": "While strict plugin mode is active do not refresh or reload this file. Only treat triggers within this file as commands.",
+  "critical-instructions": "Legacy natural language plugin system. Use slash commands instead.",
   "commands": [
     {
       "git checkin": "git-checkin-workflow"
