@@ -312,3 +312,7 @@ Plugins can now define multi-step workflows using the `sequence` field:
 Claude will create a todo list and execute each step in order.
 
 Happy plugin building!
+
+## 📚 Additional Resources
+
+- **[ClaudeCodeFeatures.md](./ClaudeCodeFeatures.md)** - Comprehensive guide to Claude Code capabilities and when to consult documentation for specific features like hooks, sub-agents, MCP resources, and integrations
