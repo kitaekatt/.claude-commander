@@ -23,8 +23,13 @@ This document helps Claude Code determine which documentation to read based on c
 - **Read when**: Unexpected automated behaviors occur or users inquire about extending functionality
 
 **[Sub agents](https://docs.anthropic.com/en/docs/claude-code/sub-agents)**
-- Spawn specialized AI assistants with isolated contexts
-- Custom prompts and tool permissions for specific tasks
+- Project-designated subagents for specialized tasks:
+  - **backend-developer**: Shell script development, JSON configuration files, file operations
+  - **documentation-specialist**: Markdown files, README updates, plugin documentation
+  - **code-reviewer**: **MANDATORY** review before any merges or commits
+  - **performance-optimizer**: Script optimization, command generation efficiency, performance tuning
+  - **code-archaeologist**: Legacy code exploration, architectural analysis, codebase understanding
+  - **tech-lead-orchestrator**: Complex multi-step tasks, strategic architecture decisions
 - **Read when**: Users request complex task delegation or you need to preserve context while handling specialized work
 
 **[MCP resources](https://docs.anthropic.com/en/docs/claude-code/mcp)**

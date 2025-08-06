@@ -278,3 +278,12 @@ Happy plugin building!
 ## 📚 Additional Resources
 
 - **[ClaudeCodeFeatures.md](./ClaudeCodeFeatures.md)** - Comprehensive guide to Claude Code capabilities and when to consult documentation for specific features like hooks, sub-agents, MCP resources, and integrations
+
+
+
+## Possible Improvements
+* Hook manager with a focus on blocking tool calls, but the real goal should be to use tools properly not block poor usage
+* Improved orchestration functionality for sub-agents
+    * Imagine a workflow that can be applied to an arbitrary problem, and a library of such workflows, we could with a command direct claude to work on a problem defined in a file using a specific intellectual workflow and delegating with a certain strategy to sub-agents
+* MCP - I think this is fine as is
+* Github Actions - this is super cool as it could make claude do lots of cool stuff but I think not right now
